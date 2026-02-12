@@ -1,0 +1,47 @@
+{% extends 'note/base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="max-width:600px;margin:auto;padding:20px;">
+    <h2>Account Settings</h2>
+    <hr>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="color:green;">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="margin-bottom:15px;">
+            <img src="{{ profile.profile_pic.url }}" alt="Profile Picture" style="width:100px;height:100px;border-radius:50%;">
+        </div>
+
+        <label>Username:</label>
+        <input type="text" name="username" value="{{ request.user.username }}" class="form-control"><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ request.user.email }}" class="form-control"><br>
+
+        <label>Date of Birth:</label>
+        <input type="date" name="dob" value="{{ profile.dob }}" class="form-control"><br>
+
+        <label>Mobile:</label>
+        <input type="text" name="mobile" value="{{ profile.mobile }}" class="form-control"><br>
+
+        <label>Gender:</label>
+        <select name="gender" class="form-control">
+            <option value="">Select</option>
+            <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+            <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+            <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+        </select><br>
+
+        <label>Profile Picture:</label>
+        <input type="file" name="profile_pic" class="form-control"><br>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

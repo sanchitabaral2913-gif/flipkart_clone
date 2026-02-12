@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-4">My Bookings</h2>
+
+<!-- USER ID yahan dikhegi -->
+<p class="alert alert-secondary">
+    <strong>User ID:</strong> User{{ request.user.id }}
+</p>
+
+{% if events %}
+<div class="row">
+    {% for event in events %}
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+
+                <h5 class="card-title">{{ event.title }}</h5>
+
+                <!-- EDIT BUTTON yahin aayega -->
+                <a href="{% url 'edit_event' event.id %}"
+                   class="btn btn-warning btn-sm mb-2">
+                    Edit
+                </a>
+
+                <p class="card-text">{{ event.description }}</p>
+                <p><strong>Date:</strong> {{ event.date }}</p>
+                <p><strong>Start Time:</strong> {{ event.start_time }}</p>
+                <p><strong>Status:</strong> {{ event.status }}</p>
+                <p><strong>Duration:</strong> {{ event.duration_hours }} hours</p>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    You have no bookings yet.
+    <a href="{% url 'book_event' %}">Book an event now!</a>
+</div>
+{% endif %}
+
+{% endblock %}

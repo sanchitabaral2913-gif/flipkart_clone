@@ -1,0 +1,18 @@
+{% extends 'note/base.html' %}
+
+{% block content %}
+<h2>Notifications</h2>
+<ul>
+  {% for notification in notifications %}
+    <li>
+      {{ notification.sender.username }} {{ notification.text }}
+      {% if notification.post %}
+        - <a href="{% url 'post_detail' notification.post.id %}">View Post</a>
+      {% endif %}
+      <small>({{ notification.created_at|naturaltime }})</small>
+    </li>
+  {% empty %}
+    <li>No notifications yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

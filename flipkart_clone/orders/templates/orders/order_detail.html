@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>Order #{{ order.id }}</h3>
+
+    <p><strong>Status:</strong> {{ order.status|capfirst }}</p>
+    <p><strong>Placed on:</strong> {{ order.created_at|date:"d M Y, h:i A" }}</p>
+
+    <hr>
+
+    <h5>Products</h5>
+
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price (₹)</th>
+                <th>Subtotal (₹)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.orderitem_set.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price|floatformat:2 }}</td>
+                <td>₹{{ item.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No products found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h5 class="text-end">
+        <strong>Total Amount: ₹{{ order.total_amount|floatformat:2 }}</strong>
+    </h5>
+
+    {% if order.status == 'pending' %}
+    <form method="POST" action="{% url 'cancel_order' order.id %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="btn btn-danger"
+                onclick="return confirm('Cancel this order?');">
+            Cancel Order
+        </button>
+    </form>
+    {% endif %}
+
+</div>
+
+{% endblock %}

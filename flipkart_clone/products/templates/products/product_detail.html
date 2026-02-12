@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ================= PRODUCT DETAILS ================= -->
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- ================= THUMBNAILS ================= -->
+        <div class="col-md-2 d-flex flex-column gap-2"> 
+            {% if product.image_front %} 
+                <img src="{{ product.image_front.url }}" class="thumb-img" data-img="{{ product.image_front.url }}">
+            {% endif %} 
+            {% if product.image_back %}
+                <img src="{{ product.image_back.url }}" class="thumb-img" data-img="{{ product.image_back.url }}">
+            {% endif %}
+            {% if product.image_left %} 
+                <img src="{{ product.image_left.url }}" class="thumb-img" data-img="{{ product.image_left.url }}">
+            {% endif %} 
+            {% if product.image_right %} 
+                <img src="{{ product.image_right.url }}" class="thumb-img" data-img="{{ product.image_right.url }}"> 
+            {% endif %} 
+        </div>
+
+        <!-- ================= MAIN IMAGE ================= -->
+        <div class="col-md-6 text-center">
+            {% if product.image_front %}
+                <img src="{{ product.image_front.url }}" id="mainImage" class="main-img"
+                     data-bs-toggle="modal" data-bs-target="#imageModal">
+            {% endif %}
+        </div>
+
+        <!-- ================= PRODUCT INFO ================= -->
+        <div class="col-md-4">
+            <h3>{{ product.name }}</h3>
+            <p class="fw-bold fs-4 text-success">₹ {{ product.price }}</p>
+            <ul class="list-group list-group-flush">
+                {% for point in product.description.splitlines %}
+                    <li class="list-group-item">{{ point }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+
+               <!-- ================= REVIEWS ================= -->
+<div class="container mt-5">
+    <h4>⭐ Customer Reviews</h4>
+    <hr>
+
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="card mb-3 shadow-sm position-relative">
+
+                <div class="card-body">
+
+                    <!-- Username -->
+                    <h6 class="mb-1 fw-bold">
+                        {{ review.user.username }}
+                    </h6>
+
+                    <!-- Rating -->
+                    <div class="mb-2 text-warning">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                ⭐
+                            {% endif %}
+                        {% endfor %}
+                        <span class="text-dark">({{ review.rating }}/5)</span>
+                    </div>
+
+                    <!-- Comment -->
+                    <p class="mb-0">{{ review.comment }}</p>
+
+                    <!-- 3 Dot Dropdown -->
+                    {% if request.user.is_authenticated and request.user == review.user %}
+                        <div class="dropdown position-absolute top-0 end-0 m-2">
+    <button class="btn btn-sm btn-light dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="true"
+            aria-expanded="false">
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end shadow">
+        <li>
+            <a class="dropdown-item"
+               href="{% url 'edit_review' review.id %}">
+               Edit
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item text-danger"
+               href="{% url 'delete_review' review.id %}">
+               Delete
+            </a>
+        </li>
+    </ul>
+</div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No reviews yet.</p>
+    {% endif %}
+</div>
+
+
+
+<!-- ================= ADD / UPDATE REVIEW ================= -->
+<div class="container mt-4">
+    {% if user.is_authenticated and user.role == "customer" %}
+        <h4>{% if user_review %}Update Your Review{% else %}Add Your Review{% endif %}</h4>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <select name="rating" class="form-select" required>
+                    <option value="">Select Rating</option>
+                    {% for i in "12345" %}
+                        <option value="{{ forloop.counter }}"
+                            {% if user_review and user_review.rating == forloop.counter %}
+                                selected
+                            {% endif %}>
+                            ⭐ {{ forloop.counter }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Review</label>
+                <textarea name="comment" class="form-control" rows="3" required>{{ user_review.comment }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                {% if user_review %}Update Review{% else %}Submit Review{% endif %}
+            </button>
+        </form>
+    {% else %}
+        <p class="text-muted">Only customers can write reviews.</p>
+    {% endif %}
+</div>
+
+<!-- ================= IMAGE MODAL ================= -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img id="modalImage" class="img-fluid" style="max-height:600px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= STYLES ================= -->
+<style>
+.thumb-img {
+    height: 80px;
+    width: 80px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+.thumb-img:hover {
+    border: 2px solid #0d6efd;
+}
+.main-img {
+    height: 400px;
+    object-fit: contain;
+    cursor: pointer;
+}
+</style>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const mainImage = document.getElementById("mainImage");
+    const modalImage = document.getElementById("modalImage");
+
+    document.querySelectorAll(".thumb-img").forEach(img => {
+        img.addEventListener("click", function () {
+            const src = this.getAttribute("data-img");
+            mainImage.src = src;
+            modalImage.src = src;
+        });
+    });
+
+    if (mainImage) {
+        mainImage.addEventListener("click", function () {
+            modalImage.src = mainImage.src;
+        });
+    }
+});
+</script>
+
+<!-- ================= BOOTSTRAP JS ================= -->
+{% endblock %}
+ 

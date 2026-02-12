@@ -1,0 +1,43 @@
+<table class="table table-bordered">
+    <tr>
+        <th>Order ID</th>
+        <th>Customer</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for order in orders %}
+    <tr>
+        <td>#{{ order.id }}</td>
+        <td>{{ order.user.username }}</td>
+        <td>₹{{ order.total_amount }}</td>
+
+        <td>
+            {% if order.status == 'pending' %}
+                <span class="badge bg-warning">Pending</span>
+            {% elif order.status == 'shipped' %}
+                <span class="badge bg-info">Shipped</span>
+            {% else %}
+                <span class="badge bg-success">Delivered</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if order.status == 'pending' %}
+                <a href="{% url 'update_order_status' order.id 'shipped' %}"
+                   class="btn btn-primary btn-sm">
+                   Mark Shipped
+                </a>
+            {% elif order.status == 'shipped' %}
+                <a href="{% url 'update_order_status' order.id 'delivered' %}"
+                   class="btn btn-success btn-sm">
+                   Mark Delivered
+                </a>
+            {% else %}
+                ✔ Completed
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

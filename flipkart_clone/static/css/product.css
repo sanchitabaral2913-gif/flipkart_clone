@@ -1,0 +1,20 @@
+.product-card {
+    height: 430px;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-img {
+    height: 200px;
+    width: 100%;
+    object-fit: contain;   /* image cut nahi hogi */
+    padding: 10px;
+    background: #fff;
+}
+
+.product-title {
+    font-size: 14px;
+    font-weight: 600;
+    height: 38px;
+    overflow: hidden;
+}

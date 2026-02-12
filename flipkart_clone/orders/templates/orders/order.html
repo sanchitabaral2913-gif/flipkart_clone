@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3 class="my-4">My Orders</h3>
+
+<div class="row">
+    {% for o in orders %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <!-- Order Basic Info -->
+                <h5 class="card-title">Order #{{ o.id }}</h5>
+                <p class="card-text"><strong>Total:</strong> ₹{{ o.total_amount|floatformat:2 }}</p>
+                <p class="card-text"><strong>Placed on:</strong> {{ o.created_at|date:"M d, Y, h:i a" }}</p>
+                <p class="card-text"><strong>Status:</strong> {{ o.status|capfirst }}</p>
+
+                <!-- View Details Button -->
+                <a href="{% url 'order_detail' o.id %}" class="btn btn-primary btn-sm">View Details</a>
+
+                <!-- Cancel Order Button: show only if order is pending -->
+                {% if o.status != 'cancelled' and o.status != 'completed' %}
+                <a href="{% url 'cancel_order' o.id %}" class="btn btn-danger btn-sm">Cancel Order</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">You have not placed any orders yet.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

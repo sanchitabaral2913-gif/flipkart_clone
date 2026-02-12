@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">My Cart</h2>
+
+    {% if cart_items %}
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td class="text-start">
+                        <div class="col-md-2 d-flex flex-column gap-2">
+            {% if product.image_front %}
+            <img src="{{ product.image_front.url }}" class="thumb-img" data-img="{{ product.image_front.url }}">
+            {% endif %}
+
+            {% if product.image_back %}
+            <img src="{{ product.image_back.url }}" class="thumb-img" data-img="{{ product.image_back.url }}">
+            {% endif %}
+
+            {% if product.image_left %}
+            <img src="{{ product.image_left.url }}" class="thumb-img" data-img="{{ product.image_left.url }}">
+            {% endif %}
+
+            {% if product.image_right %}
+            <img src="{{ product.image_right.url }}" class="thumb-img" data-img="{{ product.image_right.url }}">
+            {% endif %}
+        </div>
+
+                        {{ item.product.name }}
+                    </td>
+                    <td>₹{{ item.product.price|floatformat:2 }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.subtotal|floatformat:2 }}</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% url 'cart_increment' item.id %}" class="btn btn-success btn-sm">+</a>
+                            <a href="{% url 'cart_decrement' item.id %}" class="btn btn-warning btn-sm">-</a>
+                            <a href="{% url 'cart_remove' item.id %}" class="btn btn-danger btn-sm">Remove</a>
+
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-end align-items-center mt-4">
+        <h4 class="me-3">Total: ₹{{ total|floatformat:2 }}</h4>
+        <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Checkout</a>
+    </div>
+    {% else %}
+    <p class="text-center fs-5">Your cart is empty. <a href="{% url 'product_list' %}">Shop now!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

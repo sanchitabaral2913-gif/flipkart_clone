@@ -1,0 +1,76 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Instagram Clone{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Basic Instagram-style navbar */
+    body { margin:0; font-family: Arial, sans-serif; background:#fafafa; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#fff; border-bottom:1px solid #dbdbdb; position:sticky; top:0; z-index:1000; }
+    .logo { font-family: 'Segoe UI', sans-serif; font-size:24px; font-weight:bold; letter-spacing:2px; }
+    nav { display:flex; align-items:center; gap:20px; }
+    nav a { text-decoration:none; color:#000; font-size:18px; position:relative; }
+    nav a:hover { color:#0095f6; }
+    .profile-dropdown { position:relative; display:inline-block; }
+    .profile-dropdown img { width:32px; height:32px; border-radius:50%; cursor:pointer; }
+    .dropdown-content { display:none; position:absolute; right:0; background:#fff; min-width:150px; box-shadow:0 4px 8px rgba(0,0,0,0.1); border:1px solid #dbdbdb; border-radius:6px; overflow:hidden; z-index:1001; }
+    .dropdown-content a { display:block; padding:10px; text-decoration:none; color:#000; font-size:14px; }
+    .dropdown-content a:hover { background:#f6f6f6; }
+    .profile-dropdown:hover .dropdown-content { display:block; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Instagram</div>
+<a href="{% url 'notifications' %}" title="Notifications" style="position: relative;">
+  <i class="fa-solid fa-heart"></i>
+  {% if unread_notifications_count > 0 %}
+    <span style="
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 10px;
+    ">
+      {{ unread_notifications_count }}
+    </span>
+  {% endif %}
+</a>
+
+    <nav>
+      <a href="{% url 'home' %}" title="Home"><i class="fa-solid fa-house"></i></a>
+      <a href="{% url 'search' %}" title="Search"><i class="fa-solid fa-magnifying-glass"></i></a>
+      <a href="{% url 'reels' %}" title="Reels"><i class="fa-solid fa-clapperboard"></i></a>
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'messages' user.username %}" title="Messages"><i class="fa-solid fa-paper-plane"></i></a>
+        <a href="{% url 'notifications' %}" title="Notifications"><i class="fa-solid fa-heart"></i></a>
+
+        <!-- Profile dropdown -->
+        <div class="profile-dropdown">
+          <img src="{% if user.profile.image.url %}{{ user.profile.image.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" alt="Profile">
+          <div class="dropdown-content">
+            <a href="{% url 'profile' user.username %}">Profile</a>
+            <a href="{% url 'settings' %}">Settings</a>
+            <a href="{% url 'logout' %}">Logout</a>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

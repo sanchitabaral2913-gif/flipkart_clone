@@ -1,0 +1,100 @@
+{% extends "food/base.html" %}
+{% load static %}
+
+{% block content %}
+<div style="max-width:1200px;margin:auto;padding:40px;">
+    <h1 style="text-align: center; margin-top: 20px;">Menu</h1>
+
+{% for category, items in menu.items %}
+    <h3 style="margin:25px 0 15px;font-size:22px;color:#fc8019;">{{ category }}</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;">
+        {% for product in items %}
+        <div class="product-card" data-id="{{ product.id }}" data-images="{{ product.images|join:',' }}"
+             style="border:1px solid #eee;padding:15px;border-radius:12px;text-align:center;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.05);position:relative;overflow:hidden;">
+    
+
+            <!-- Ribbon -->
+            {% if product.ribbon %}
+            <span style="position:absolute;top:10px;left:0;background:#fc8019;color:white;
+                         padding:4px 12px;border-radius:0 6px 6px 0;font-size:13px;">
+                {{ product.ribbon }}
+            </span>
+            {% endif %}
+
+            <!-- Main Product Image -->
+            <img id="main-img-{{ product.id }}" src="{% static product.images.0 %}"
+                 style="width:100%;height:180px;object-fit:cover;border-radius:10px;transition:0.4s;">
+
+            <!-- Thumbnails -->
+            <div style="display:flex;justify-content:center;margin-top:8px;gap:8px;">
+                {% for img in product.images %}
+                <img src="{% static img %}" onclick="switchImage({{ product.id }}, this.src)"
+                     style="width:45px;height:45px;object-fit:cover;border-radius:6px;
+                            cursor:pointer;border:1px solid #ddd;">
+                {% endfor %}
+            </div>
+
+            <h3 style="margin-top:12px;">{{ product.name }}</h3>
+            <p>₹{{ product.price }}</p>
+
+            <!-- Add to Cart -->
+            <button class="add-to-cart-btn" data-id="{{ product.id }}"
+                    style="background:#fc8019;color:white;border:none;padding:10px 18px;
+                           border-radius:8px;cursor:pointer;">
+                Add to Cart
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function switchImage(productId, imgSrc) {
+    document.getElementById("main-img-" + productId).src = imgSrc;
+}
+
+// Auto-slide on hover
+document.querySelectorAll(".product-card").forEach(card => {
+    let intervalId;
+    const productId = card.dataset.id;
+    const images = card.dataset.images.split(",");
+    const mainImg = document.getElementById("main-img-" + productId);
+
+    card.addEventListener("mouseenter", () => {
+        let index = 0;
+        intervalId = setInterval(() => {
+            index = (index + 1) % images.length;
+            mainImg.src = "/static/" + images[index];
+        }, 1200);
+    });
+
+    card.addEventListener("mouseleave", () => {
+        clearInterval(intervalId);
+        mainImg.src = "/static/" + images[0]; // reset to first image
+    });
+});
+
+// AJAX Add to Cart
+document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const productId = btn.dataset.id;
+
+        fetch(`/add-to-cart/${productId}/?qty=1`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart count in navbar
+                let cartCountElem = document.getElementById("cart-count");
+                if (cartCountElem) {
+                    cartCountElem.textContent = data.cart_count;
+                } else {
+                    console.log("Cart count element not found in navbar.");
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

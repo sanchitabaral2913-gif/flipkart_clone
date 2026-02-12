@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Seller Dashboard</h2>
+
+<p>Total Orders: {{ orders.count }}</p>
+
+{% for order in orders %}
+    <div class="card p-2 mb-2">
+        <strong>Order #{{ order.id }}</strong>
+        <p>Status: {{ order.status }}</p>
+    </div>
+{% empty %}
+    <p>No orders found</p>
+{% endfor %}
+
+{% endblock %}

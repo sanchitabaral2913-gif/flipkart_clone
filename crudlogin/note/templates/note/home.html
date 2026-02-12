@@ -1,0 +1,108 @@
+{% extends 'note/base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- User info card -->
+            <div class="card p-3 shadow-sm text-center">
+                <img src="{{ request.user.profile.profile_pic.url }}" class="rounded-circle mb-2" style="width:80px; height:80px; object-fit:cover;">
+                <h6 class="fw-bold">{{ request.user.username }}</h6>
+                <p class="text-muted mb-0">{{ request.user.profile.mobile }}</p>
+                <p class="text-muted">{{ request.user.profile.dob|date:"M d, Y" }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            {% for post in posts %}
+            <div class="card mb-4 shadow-sm">
+                <!-- Post Header -->
+                <div class="d-flex align-items-center p-2">
+                    <img src="{{ post.profile.profile_pic.url }}" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+                    <strong>{{ post.profile.user.username }}</strong>
+                </div>
+
+                <!-- Post Images (Carousel) -->
+                {% if post.images.count > 1 %}
+                <div id="carousel{{ post.id }}" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for img in post.images.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ img.image.url }}" class="d-block w-100" style="height:400px; object-fit:cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ post.id }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ post.id }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+                {% else %}
+                {% for img in post.images.all %}
+                <img src="{{ img.image.url }}" class="img-fluid">
+                {% endfor %}
+                {% endif %}
+
+                <!-- Post actions -->
+                <div class="p-2 d-flex align-items-center">
+                    <form action="{% url 'like_post' post.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link p-0 me-2">
+                            {% if request.user in post.likes.all %}
+                                <i class="fa-solid fa-heart text-danger"></i>
+                            {% else %}
+                                <i class="fa-regular fa-heart"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                    <span>{{ post.likes.count }} likes</span>
+                </div>
+
+                <!-- Caption -->
+                <div class="p-2">
+                    <p class="mb-1"><strong>{{ post.profile.user.username }}</strong> {{ post.caption }}</p>
+                </div>
+
+                <!-- Comments -->
+                <div class="p-2">
+                    {% for comment in post.comments.all %}
+                    <p class="mb-1"><strong>{{ comment.user.username }}</strong> {{ comment.text }}</p>
+                    {% endfor %}
+
+                    <!-- Add comment form -->
+                    <form action="{% url 'add_comment' post.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="comment_text" class="form-control form-control-sm" placeholder="Add a comment...">
+                            <button class="btn btn-primary btn-sm" type="submit">Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-muted">No posts to display.</p>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-3">
+            <!-- Suggestions -->
+            <div class="card p-3 shadow-sm">
+                <h6 class="fw-bold">Suggestions</h6>
+                <ul class="list-unstyled">
+                    <li class="d-flex align-items-center mb-2">
+                        <img src="{% static 'default_profile.png' %}" class="rounded-circle me-2" style="width:30px; height:30px; object-fit:cover;">
+                        <span>User1</span>
+                        <a href="#" class="ms-auto text-primary">Follow</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

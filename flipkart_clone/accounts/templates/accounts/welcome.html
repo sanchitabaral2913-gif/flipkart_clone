@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #2874f0, #1c5dc9);
+            color: white;
+            text-align: center;
+            padding: 60px;
+        }
+        .box {
+            background: white;
+            color: black;
+            padding: 40px;
+            border-radius: 10px;
+            width: 60%;
+            margin: auto;
+        }
+        .btn {
+            background: #2874f0;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+
+    {% if user.role == 'customer' %}
+        <h1>🎉 Welcome to Flipkart Clone!</h1>
+        <h3>Big Billion Days Sale is LIVE 🔥</h3>
+        <p>
+            ✔ Up to 70% OFF  
+            ✔ Free Delivery on First Order  
+            ✔ Easy Returns & Secure Payments  
+        </p>
+
+    {% elif user.role == 'seller' %}
+        <h1>🚀 Welcome Seller!</h1>
+        <h3>Start Selling & Grow Your Business</h3>
+        <p>
+            ✔ Reach 1 Crore+ Customers  
+            ✔ Zero Registration Fee  
+            ✔ Easy Product Upload & Fast Payments  
+        </p>
+    {% endif %}
+
+    <br><br>
+    <a href="{% url 'product_list' %}" class="btn">Continue to Home</a>
+
+</div>
+
+</body>
+</html>

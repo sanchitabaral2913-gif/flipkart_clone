@@ -1,0 +1,100 @@
+{% extends "food/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="order-container" style="max-width:900px;margin:auto;padding:20px;">
+    <h1 style="text-align:center;margin-bottom:20px;">Your Cart</h1>
+
+    {% if cart %}
+        <div id="cart-items">
+            {% for pid, item in cart.items %}
+            <div class="cart-item" id="item-{{ pid }}" 
+                 style="display:flex;align-items:center;justify-content:space-between;
+                        border:1px solid #ddd;padding:15px;margin-bottom:15px;
+                        border-radius:12px;box-shadow:0 3px 6px rgba(0,0,0,0.05);">
+                
+                <!-- Product Image -->
+                <img src="{% static item.image %}" alt="{{ item.name }}"
+                     style="width:100px;height:100px;object-fit:cover;border-radius:10px;">
+
+                <!-- Product Details -->
+                <div style="flex:1;margin-left:15px;">
+                    <h3 style="margin:0;">{{ item.name }}</h3>
+                    <p style="margin:5px 0;color:#666;">₹{{ item.price }}</p>
+
+                    <!-- Quantity Controls -->
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <button onclick="updateCart('{{ pid }}','decrement')" 
+                                style="width:32px;height:32px;border:none;border-radius:50%;
+                                       background:#ff4d4d;color:#fff;font-size:18px;">-</button>
+
+                        <span id="qty-{{ pid }}" style="min-width:25px;text-align:center;font-weight:bold;">
+                            {{ item.quantity }}
+                        </span>
+
+                        <button onclick="updateCart('{{ pid }}','increment')" 
+                                style="width:32px;height:32px;border:none;border-radius:50%;
+                                       background:#4CAF50;color:#fff;font-size:18px;">+</button>
+                    </div>
+                </div>
+
+                <!-- Subtotal -->
+                <div>
+                    <p style="margin:0;font-weight:bold;color:#333;">
+                        ₹<span id="subtotal-{{ pid }}">{{ item.price|floatformat:0|add:""|floatformat:0|safe|default:0|add:0|floatformat:0 }}</span>
+                    </p>
+                    <a href="{% url 'remove_from_cart' pid %}" 
+                       style="color:#ff4d4d;text-decoration:none;font-size:14px;">Remove</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Total -->
+        <div style="text-align:right;margin-top:20px;font-size:18px;">
+            <strong>Total: ₹<span id="total-price">{{ total_price }}</span></strong>
+        </div>
+
+        <!-- Order Button -->
+        <div style="text-align:center;margin-top:25px;">
+            <button style="padding:12px 25px;background:#fc8019;color:white;
+                           border:none;border-radius:8px;font-size:18px;cursor:pointer;">
+                Proceed to Checkout
+            </button>
+        </div>
+    {% else %}
+        <p style="text-align:center;font-size:18px;">Your cart is empty!</p>
+    {% endif %}
+</div>
+
+<!-- ✅ AJAX Script for Live Updates -->
+<script>
+function updateCart(productId, action) {
+    fetch("{% url 'update_cart' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `product_id=${productId}&action=${action}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.quantity > 0) {
+                // Update quantity
+                document.getElementById(`qty-${productId}`).innerText = data.quantity;
+                // Update subtotal
+                let price = parseInt(document.getElementById(`subtotal-${productId}`).innerText) / (data.quantity - 1 || 1);
+                document.getElementById(`subtotal-${productId}`).innerText = price * data.quantity;
+            } else {
+                // Remove item if qty = 0
+                document.getElementById(`item-${productId}`).remove();
+            }
+            // Update total price
+            document.getElementById("total-price").innerText = data.total_price;
+        }
+    });
+}
+</script>
+{% endblock %}

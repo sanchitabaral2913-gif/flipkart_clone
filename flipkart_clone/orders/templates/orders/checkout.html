@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Checkout</h2>
+
+    <div class="row">
+        <!-- Cart Items -->
+        <div class="col-md-8">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td class="text-start d-flex align-items-center">
+                            <img src="{{ item.product.image_front.url }}" width="60" class="me-3 rounded">
+                            <div>
+                                <a href="{% url 'product_detail' item.product.id %}" class="text-decoration-none">
+                                    {{ item.product.name }}
+                                </a>
+                            </div>
+                        </td>
+                        <td>₹{{ item.product.price|floatformat:2 }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Your cart is empty!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4">
+                <h4 class="mb-3">Order Summary</h4>
+                <p>Total Items: <strong>{{ cart_items|length }}</strong></p>
+                <p>Total Amount: <strong>₹{{ total|floatformat:2 }}</strong></p>
+                <hr>
+                <!-- Fake Payment Form -->
+                <h5 class="mb-3">Payment Details</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" name="card_number" class="form-control" placeholder="Card Number" required>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <input type="text" name="expiry" class="form-control me-2" placeholder="MM/YY" required>
+                        <input type="text" name="cvv" class="form-control" placeholder="CVV" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 btn-lg">Place Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

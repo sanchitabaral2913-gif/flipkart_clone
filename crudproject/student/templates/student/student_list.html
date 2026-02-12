@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h1 class="mb-4">Student List</h1>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>City</th>
+            <th>Gender</th>
+            <th>Hobby</th>
+            <th>Mobile</th>
+            <th>Details</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        
+<td>
+                {% if student.image %}
+                    <img src="{{ student.image.url }}" width="80" height="80" alt="Student Image">
+                {% else %}
+                    <img src="{% static 'images/stu1.jpg' %}" width="80" height="80" alt="No Image">
+                {% endif %}
+            </td>
+
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.city }}</td>
+            <td>{{ student.get_gender_display }}</td>
+            <td>{{ student.hobby }}</td>
+            <td>{{ student.mobile }}</td>
+            <td>{{ student.details }}</td>
+            <td>
+                <a href="{% url 'student:edit' student.id %}" class="btn btn-sm btn-warning">✏️ Edit</a>
+                <a href="{% url 'student:delete' student.id %}" class="btn btn-sm btn-danger">🗑️ Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9" class="text-center">No Students Found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Add New Product</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Category -->
+        <div class="mb-3">
+            <label for="id_category" class="form-label"><strong>Category:</strong></label>
+            {{ form.category }}
+        </div>
+
+        <!-- Product Name -->
+        <div class="mb-3">
+            <label for="id_name" class="form-label"><strong>Product Name:</strong></label>
+            {{ form.name }}
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label for="id_description" class="form-label"><strong>Description:</strong></label>
+            {{ form.description }}
+        </div>
+
+        <!-- Price -->
+        <div class="mb-3">
+            <label for="id_price" class="form-label"><strong>Price (₹):</strong></label>
+            {{ form.price }}
+        </div>
+
+        <!-- Images -->
+        <div class="mb-3">
+            <label class="form-label"><strong>Front Image:</strong></label>
+            {{ form.image_front }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Back Image:</strong></label>
+            {{ form.image_back }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Left Image:</strong></label>
+            {{ form.image_left }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label"><strong>Right Image:</strong></label>
+            {{ form.image_right }}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Add Product</button>
+    </form>
+</div>
+
+<!-- Optional: Preview images before upload -->
+<script>
+const frontInput = document.getElementById('id_image_front');
+const backInput = document.getElementById('id_image_back');
+const leftInput = document.getElementById('id_image_left');
+const rightInput = document.getElementById('id_image_right');
+
+function previewImage(input, previewId) {
+    input.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(previewId).src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Optional: add img tags in HTML with ids: front_preview, back_preview, left_preview, right_preview
+previewImage(frontInput, 'front_preview');
+previewImage(backInput, 'back_preview');
+previewImage(leftInput, 'left_preview');
+previewImage(rightInput, 'right_preview');
+</script>
+
+{% endblock %}

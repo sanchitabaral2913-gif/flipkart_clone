@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Seller Orders</h2>
+{% for order in orders %}
+<div class="card mb-2 p-3">
+    <h5>Order #{{ order.id }} - {{ order.user.username }}</h5>
+    <p>Status: {{ order.status }}</p>
+    <ul>
+        {% for item in order.orderitem_set.all %}
+            {% if item.product.seller == request.user %}
+            <li>{{ item.product.name }} | Qty: {{ item.quantity }} | ₹{{ item.product.price }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% if order.status == 'pending' %}
+    <a href="{% url 'complete_order' order.id %}" class="btn btn-success btn-sm">Complete Order</a>
+    {% endif %}
+</div>
+{% empty %}
+<p>No orders yet.</p>
+{% endfor %}
+{% endblock %}

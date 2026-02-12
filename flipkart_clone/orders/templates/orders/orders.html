@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Orders
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Orders</h2>
+
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-12 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Order ID: {{ order.id }}
+                            </h5>
+
+                            <p class="card-text mb-1">
+                                <strong>Date:</strong> {{ order.created_at }}
+                            </p>
+
+                            <p class="card-text mb-1">
+                                <strong>Status:</strong> {{ order.status }}
+                            </p>
+
+                            <p class="card-text mb-2">
+                                <strong>Total Amount:</strong> ₹{{ order.total_price }}
+                            </p>
+
+                            <a href="{% url 'order_detail' order.id %}" class="btn btn-primary btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You have not placed any orders yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
